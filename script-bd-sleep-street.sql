@@ -34,6 +34,9 @@ VALUES
     (3, 789, 'Viagem para Tóquio', 'Tóquio', 'Japão', 'JST', '2025-10-25', '2025-10-30', 1800.00, TRUE, NOW()),
     (4, 123, 'Casamento em Florença', 'Florença', 'Itália', 'CET', '2025-08-10', '2025-08-15', 5200.00, TRUE, NOW());
 
+ADD CONSTRAINT fk_usuario_responsavel
+  FOREIGN KEY (id_responsavel_legal) REFERENCES usuario(id_usuario);
+
 CREATE TABLE usuario (
   id_usuario           INT SERIAL PRIMARY KEY,
   nome                  varchar(100) NOT NULL,
@@ -67,6 +70,8 @@ VALUES
     (9, 789, 'Thiago Nunes', 'thiago@email.com', '(41) 92222-2222'),
     (10, 123, 'Juliana Almeida', 'juliana@email.com', '(41) 91111-1111');
 
+ADD CONSTRAINT fk_favorito_estabelecimento
+  FOREIGN KEY (id_estabelecimento) REFERENCES estabelecimento(id_estabelecimento);
 
 CREATE TABLE estabelecimento_favorito(
  id_favorito  SERIAL PRIMARY KEY,
@@ -93,6 +98,7 @@ VALUES
     (8, 789, 108, 'Restaurante do João', NOW(), 4.3),
     (9, 123, 109, 'Pet Shop do Bidu', NOW(), 4.9),
     (10, 456, 110, 'Clínica do Dr. Pedro', NOW(), 4.6);
+
 
 
 CREATE TABLE estabelecimento(
