@@ -1,323 +1,221 @@
-ADD CONSTRAINT fk_viagem_usuario
-FOREIGN KEY (id_viajante) REFERENCES usuario (id_usuario);
+CREATE TABLE usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    eh_maior_idade BOOLEAN NOT NULL,
+    fk_usuario_responsavel INT,
+    tipo_perfil VARCHAR(50) NOT NULL,
+    consentimento_lgpd_geo BOOLEAN NOT NULL,
+    data_cadastro TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_usuario_responsavel foreign key (fk_usuario_responsavel) references usuario (id_usuario)
+);
+
+INSERT INTO usuario (id_usuario, nome, email, senha_hash, data_nascimento, eh_maior_idade, fk_usuario_responsavel, tipo_perfil, consentimento_lgpd_geo)
+VALUES
+    (1, 'João Silva', 'joao@email.com', '$2a$10$ExemploSenhaHash123', '1995-05-15', TRUE, NULL, 'viajante', TRUE),
+    (2, 'Maria Santos', 'maria@email.com', '$2a$10$ExemploSenhaHash456', '1998-08-22', TRUE, NULL, 'viajante', TRUE),
+    (3, 'Pedro Oliveira', 'pedro@email.com', '$2a$10$ExemploSenhaHash789', '1992-11-10', TRUE, NULL, 'viajante', TRUE),
+    (4, 'Ana Costa', 'ana@email.com', '$2a$10$ExemploSenhaHash012', '2000-03-05', TRUE, NULL, 'viajante', TRUE),
+    (5, 'Lucas Mendes', 'lucas@email.com', '$2a$10$ExemploSenhaHash345', '1997-07-30', TRUE, NULL, 'moderador', TRUE),
+    (6, 'Beatriz Lima', 'beatriz@email.com', '$2a$10$ExemploSenhaHash678', '1994-12-12', TRUE, NULL, 'moderador', TRUE),
+    (7, 'Carlos Ferreira', 'carlos@email.com', '$2a$10$ExemploSenhaHash901', '1999-06-25', TRUE, NULL, 'moderador', TRUE),
+    (8, 'Fernanda Rocha', 'fernanda@email.com', '$2a$10$ExemploSenhaHash234', '1996-09-18', TRUE, NULL, 'administrador', TRUE),
+    (9, 'Thiago Nunes', 'thiago@email.com', '$2a$10$ExemploSenhaHash567', '2001-04-08', TRUE, NULL, 'viajante', TRUE),
+    (10, 'Juliana Almeida', 'juliana@email.com', '$2a$10$ExemploSenhaHash890', '1993-01-20', TRUE, NULL, 'viajante', TRUE);
+
 
 CREATE TABLE viagem (
- id_viagem  INT SERIAL PRIMARY KEY,
- id_viajante INT not null,
- titulo_viagem varchar(255) not null,
- destino_cidade varchar(100) not null,
- destino_pais varchar(100) not null,
- fuso_horario_destino varchar(50) not null,
- data_inicio date not null,
- data_fim date not null,
- orcamento_total decimal(12,2) not null,
- ativa boolean,
- data_criacao timestamp
+    id_viagem SERIAL PRIMARY KEY,
+    fk_usuario INT NOT NULL,
+    titulo_viagem VARCHAR(255) NOT NULL,
+    destino_cidade VARCHAR(100) NOT NULL,
+    destino_pais VARCHAR(100) NOT NULL,
+    fuso_horario_destino VARCHAR(50) NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE NOT NULL,
+    orcamento_total DECIMAL(12,2) NOT NULL,
+    ativa BOOLEAN NOT NULL DEFAULT TRUE,
+    data_criacao TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_usuario foreign key (fk_usuario) references usuario (id_usuario)
+);
 
-) 
- INSERT INTO viagem (
-    id_viagem,
-    id_viajante,
-    titulo_viagem,
-    destino_cidade,
-    destino_pais,
-    fuso_horario_destino,
-    data_inicio,
-    data_fim,
-    orcamento_total,
-    ativa,
-    data_criacao
-)
+INSERT INTO viagem (id_viagem, fk_usuario, titulo_viagem, destino_cidade, destino_pais, fuso_horario_destino, data_inicio, data_fim, orcamento_total, ativa)
 VALUES
-    (1, 123, 'Férias na praia', 'Rio de Janeiro', 'Brasil', 'BRT', '2025-12-15', '2025-12-20', 4500.00, TRUE, NOW()),
-    (2, 456, 'Trabalho em Paris', 'Paris', 'França', 'CET', '2025-11-10', '2025-11-15', 3200.00, FALSE, NOW()),
-    (3, 789, 'Viagem para Tóquio', 'Tóquio', 'Japão', 'JST', '2025-10-25', '2025-10-30', 1800.00, TRUE, NOW()),
-    (4, 123, 'Casamento em Florença', 'Florença', 'Itália', 'CET', '2025-08-10', '2025-08-15', 5200.00, TRUE, NOW());
+    (1, 1, 'Férias na praia', 'Rio de Janeiro', 'Brasil', 'BRT', '2025-12-15', '2025-12-20', 4500.00, TRUE),
+    (2, 2, 'Trabalho em Paris', 'Paris', 'França', 'CET', '2025-11-10', '2025-11-15', 3200.00, FALSE),
+    (3, 3, 'Viagem para Tóquio', 'Tóquio', 'Japão', 'JST', '2025-10-25', '2025-10-30', 1800.00, TRUE),
+    (4, 1, 'Casamento em Florença', 'Florença', 'Itália', 'CET', '2025-08-10', '2025-08-15', 5200.00, TRUE);
 
-ADD CONSTRAINT fk_usuario_responsavel
-  FOREIGN KEY (id_responsavel_legal) REFERENCES usuario(id_usuario);
 
-CREATE TABLE usuario (
-  id_usuario           INT SERIAL PRIMARY KEY,
-  nome                  varchar(100) NOT NULL,
-  email                 varchar(100) NOT NULL UNIQUE,
-  senha_hash            varchar(255) NOT NULL,
-  data_nascimento       date NOT NULL,
-  eh_maior_idade        boolean NOT NULL,
-  id_responsavel_legal  int,
-  tipo_perfil           varchar(50) NOT NULL,
-  consentimento_lgpd_geo boolean NOT NULL,
-  data_cadastro         timestamp DEFAULT now()
-)
- INSERT INTO usuario (
-    id_usuario,
-    id_viajante,
-    nome,
-    email,
-    telefone,
-    data_criacao
-)
+CREATE TABLE estabelecimento (
+    id_estabelecimento SERIAL PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    categoria_estabelecimento VARCHAR(255) NOT NULL,
+    faixa_preco VARCHAR(255) NOT NULL,
+    avaliacao_media DECIMAL(3,2),
+    latitude DECIMAL(10,8) NOT NULL,
+    longitude DECIMAL(11,8) NOT NULL,
+    horario_abertura TIME,
+    horario_fechamento TIME,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+);
 
+INSERT INTO estabelecimento (id_estabelecimento, nome, categoria_estabelecimento, faixa_preco, avaliacao_media, latitude, longitude, horario_abertura, horario_fechamento, ativo)
 VALUES
-    (1, 123, 'João Silva', 'joao@email.com', '(41) 98765-4321'),
-    (2, 456, 'Maria Santos', 'maria@email.com', '(41) 99999-9999'),
-    (3, 789, 'Pedro Oliveira', 'pedro@email.com', '(41) 98888-8888'),
-    (4, 123, 'Ana Costa', 'ana@email.com', '(41) 97777-7777'),
-    (5, 456, 'Lucas Mendes', 'lucas@email.com', '(41) 96666-6666'),
-    (6, 789, 'Beatriz Lima', 'beatriz@email.com', '(41) 95555-5555'),
-    (7, 123, 'Carlos Ferreira', 'carlos@email.com', '(41) 94444-4444'),
-    (8, 456, 'Fernanda Rocha', 'fernanda@email.com', '(41) 93333-3333'),
-    (9, 789, 'Thiago Nunes', 'thiago@email.com', '(41) 92222-2222'),
-    (10, 123, 'Juliana Almeida', 'juliana@email.com', '(41) 91111-1111');
+    (101, 'Café do Povo', 'Cafeteria', 'Barato', 4.80, -25.4284, -49.2733, '07:00', '18:00', TRUE),
+    (102, 'Padaria do Tio Zé', 'Padaria', 'Barato', 4.50, -25.4284, -49.2733, '06:00', '20:00', TRUE),
+    (103, 'Churrascaria do Zé', 'Restaurante', 'Médio', 4.90, -25.4284, -49.2733, '12:00', '23:00', TRUE),
+    (104, 'Mercado Central', 'Supermercado', 'Barato', 4.70, -25.4284, -49.2733, '08:00', '22:00', TRUE),
+    (105, 'Lanchonete da Maria', 'Lanchonete', 'Barato', 4.60, -25.4284, -49.2733, '08:00', '22:00', TRUE),
+    (106, 'Bar do Chico', 'Bar', 'Médio', 4.40, -25.4284, -49.2733, '16:00', '02:00', TRUE),
+    (107, 'Sorveteria Geladinha', 'Sorveteria', 'Barato', 4.90, -25.4284, -49.2733, '11:00', '23:00', TRUE),
+    (108, 'Restaurante do João', 'Restaurante', 'Médio', 4.80, -25.4284, -49.2733, '12:00', '23:00', TRUE),
+    (109, 'Pet Shop do Bidu', 'Pet Shop', 'Barato', 4.70, -25.4284, -49.2733, '09:00', '20:00', TRUE),
+    (110, 'Clínica do Dr. Pedro', 'Clínica', 'Médio', 4.90, -25.4284, -49.2733, '08:00', '20:00', TRUE);
 
-ADD CONSTRAINT fk_favorito_estabelecimento
-  FOREIGN KEY (id_estabelecimento) REFERENCES estabelecimento(id_estabelecimento);
 
-CREATE TABLE estabelecimento_favorito(
- id_favorito  SERIAL PRIMARY KEY,
- id_usuario int not null,
- id_estabelecimento int not null,
- data_adicao timestamp
-)
- INSERT INTO estabelecimento_favorito (
-    id_estabelecimento_favorito,
-    id_usuario,
-    id_estabelecimento,
-    nome_estabelecimento,
-    data_adicionado,
-    nota
-)
+CREATE TABLE estabelecimento_favorito (
+    id_favorito SERIAL PRIMARY KEY,
+    fk_usuario INT NOT NULL,
+    fk_estabelecimento INT NOT NULL,
+    data_adicao TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_usuario foreign key (fk_usuario) references usuario (id_usuario),
+    constraint fk_estabelecimento foreign key (fk_estabelecimento) references estabelecimento (id_estabelecimento)
+);
+
+INSERT INTO estabelecimento_favorito (fk_usuario, fk_estabelecimento)
 VALUES
-    (1, 123, 101, 'Café do Povo', NOW(), 5.0),
-    (2, 123, 102, 'Padaria do Tio Zé', NOW(), 4.5),
-    (3, 456, 103, 'Churrascaria do Zé', NOW(), 4.0),
-    (4, 456, 104, 'Mercado Central', NOW(), 4.8),
-    (5, 789, 105, 'Lanchonete da Maria', NOW(), 4.2),
-    (6, 123, 106, 'Bar do Chico', NOW(), 4.7),
-    (7, 456, 107, 'Sorveteria Geladinha', NOW(), 5.0),
-    (8, 789, 108, 'Restaurante do João', NOW(), 4.3),
-    (9, 123, 109, 'Pet Shop do Bidu', NOW(), 4.9),
-    (10, 456, 110, 'Clínica do Dr. Pedro', NOW(), 4.6);
+    (1, 101), (1, 102), (1, 106),
+    (2, 103), (2, 104), (2, 107),
+    (3, 105), (3, 108),
+    (4, 109), (4, 110);
 
 
+CREATE TABLE despesa_viagem (
+    id_despesa SERIAL PRIMARY KEY,
+    fk_viagem INT NOT NULL,
+    categoria_despesa VARCHAR(100) NOT NULL,
+    descricao VARCHAR(150) NOT NULL,
+    valor_despesa DECIMAL(10,2) NOT NULL,
+    data_despesa TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_viagem foreign key (fk_viagem) references viagem (id_viagem)
+);
 
-CREATE TABLE estabelecimento(
-  id_estabelecimento  SERIAL PRIMARY KEY,
-  nome varchar(150) not null,
-  categoria_estabelecimento varchar(255) not null,
-  faixa_preco varchar(255) not null,
-  avaliacao_media decimal(3,2),
-  latitude decimal(10,8) not null,
-  longitude decimal(11,8) not null,
-  horario_abertura time,
-  horario_fechamento time,
-  ativo boolean
-)
-  INSERT INTO estabelecimento (
-    id_estabelecimento,
-    id_usuario,
-    nome,
-    tipo,
-    endereco,
-    cidade,
-    estado,
-    pais,
-    telefone,
-    horario_funcionamento,
-    nota,
-    data_criacao
-)
+INSERT INTO despesa_viagem (fk_viagem, categoria_despesa, descricao, valor_despesa)
 VALUES
-    (101, 123, 'Café do Povo', 'Cafeteria', 'Rua das Flores, 123', 'Curitiba', 'PR', 'Brasil', '(41) 98765-4321', '07:00 - 18:00', 4.8, NOW()),
-    (102, 123, 'Padaria do Tio Zé', 'Padaria', 'Rua da Padaria, 456', 'Curitiba', 'PR', 'Brasil', '(41) 99999-9999', '06:00 - 20:00', 4.5, NOW()),
-    (103, 123, 'Churrascaria do Zé', 'Restaurante', 'Av. Principal, 789', 'Curitiba', 'PR', 'Brasil', '(41) 98888-8888', '12:00 - 23:00', 4.9, NOW()),
-    (104, 456, 'Mercado Central', 'Supermercado', 'Rua do Mercado, 321', 'Curitiba', 'PR', 'Brasil', '(41) 97777-7777', '08:00 - 22:00', 4.7, NOW()),
-    (105, 456, 'Lanchonete da Maria', 'Lanchonete', 'Rua dos Lanchões, 654', 'Curitiba', 'PR', 'Brasil', '(41) 96666-6666', '08:00 - 22:00', 4.6, NOW()),
-    (106, 789, 'Bar do Chico', 'Bar', 'Rua do Bar, 987', 'Curitiba', 'PR', 'Brasil', '(41) 95555-5555', '16:00 - 02:00', 4.4, NOW()),
-    (107, 789, 'Sorveteria Geladinha', 'Sorveteria', 'Rua dos Sorvetes, 111', 'Curitiba', 'PR', 'Brasil', '(41) 94444-4444', '11:00 - 23:00', 4.9, NOW()),
-    (108, 123, 'Restaurante do João', 'Restaurante', 'Rua do Restaurante, 222', 'Curitiba', 'PR', 'Brasil', '(41) 93333-3333', '12:00 - 23:00', 4.8, NOW()),
-    (109, 456, 'Pet Shop do Bidu', 'Pet Shop', 'Rua dos Pets, 333', 'Curitiba', 'PR', 'Brasil', '(41) 92222-2222', '09:00 - 20:00', 4.7, NOW()),
-    (110, 789, 'Clínica do Dr. Pedro', 'Clínica', 'Rua da Saúde, 444', 'Curitiba', 'PR', 'Brasil', '(41) 91111-1111', '08:00 - 20:00', 4.9, NOW());
+    (1, 'Alimentação', 'Café expresso duplo', 2.50),
+    (1, 'Transporte', 'Táxi para o hotel', 45.00),
+    (2, 'Alimentação', 'Pão de queijo e café', 8.50),
+    (2, 'Transporte', 'Passagem de metrô', 3.80),
+    (3, 'Transporte', 'Passagem local', 20.00),
+    (3, 'Hospedagem', 'Internet do hotel', 15.00),
+    (4, 'Alimentação', 'Jantar executivo', 35.00),
+    (4, 'Passeios', 'Ingresso para museu', 25.00);
 
-CREATE TABLE despesa_viagem(
-  id_despesa  SERIAL PRIMARY KEY,
-  id_viagem int not null,
-  categoria_despesa_enum varchar not null,
-  descricao varchar(150) not null,
-  valor_despesa decimal(10,2) not null,
-  data_despesa timestamp
-)
- INSERT INTO despeja_viagem (
-    id_despeja_viagem,
-    id_usuario,
-    id_estabelecimento,
-    id_viajem,
-    data_hora_despeja,
-    quantidade,
-    observacao
-)
+
+CREATE TABLE solicitacao_reembolso (id_reembolso SERIAL PRIMARY KEY,
+    fk_viagem INT NOT NULL,
+    fk_usuario_solicitante INT NOT NULL,
+    descricao_incidente TEXT NOT NULL,
+    valor_total_pleiteado DECIMAL(10,2) NOT NULL,
+    url_comprovante_anexo VARCHAR(255),
+    status_reembolso VARCHAR(255) NOT NULL DEFAULT 'pendente',
+    fk_usuario_moderador INT,
+    data_solicitacao TIMESTAMP NOT NULL DEFAULT NOW(),
+    data_atualizacao TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_viagem foreign key (fk_viagem) references viagem (id_viagem),
+    constraint fk_usuario_solicitante foreign key (fk_usuario_solicitante) references usuario (id_usuario),
+    constraint fk_usuario_moderador foreign key (fk_usuario_moderador) references usuario (id_usuario)
+);
+
+INSERT INTO solicitacao_reembolso (fk_viagem, fk_usuario_solicitante, descricao_incidente, valor_total_pleiteado, url_comprovante_anexo, status_reembolso, fk_usuario_moderador)
 VALUES
-    (1, 123, 101, 1, NOW(), 2.5, 'Café expresso duplo'),
-    (2, 123, 102, 2, NOW(), 1.0, 'Pão de queijo 3 unidades'),
-    (3, 456, 103, 1, NOW(), 0.8, 'Cerveja artesanal 500ml'),
-    (4, 456, 104, 3, NOW(), 3.0, 'Água mineral 2L'),
-    (5, 789, 105, 2, NOW(), 4.0, 'Lanche misto 2 unidades'),
-    (6, 789, 106, 1, NOW(), 1.2, 'Cerveja lager 600ml'),
-    (7, 123, 107, 4, NOW(), 1.5, 'Sorvete de chocolate 200g'),
-    (8, 456, 108, 2, NOW(), 2.0, 'Suco natural laranja 300ml'),
-    (9, 789, 109, 1, NOW(), 0.5, 'Ração para cães 500g'),
-    (10, 123, 110, 3, NOW(), 1.0, 'Medicamento para pets 100ml');
+    (1, 1, 'Passagem aérea ida e volta', 350.00, 'comprovante_1.pdf', 'aprovado', 5),
+    (1, 1, 'Estadia no hotel', 280.00, 'comprovante_2.pdf', 'aprovado', 5),
+    (2, 2, 'Alimentação e transporte local', 120.00, 'comprovante_3.pdf', 'aprovado', 6),
+    (2, 2, 'Passeios e ingressos', 450.00, NULL, 'pendente', 6),
+    (3, 3, 'Transporte local e táxi', 190.00, 'comprovante_5.pdf', 'aprovado', 7);
 
 
-CREATE TABLE historico_status_reembolso(
-  id_historico  SERIAL PRIMARY KEY,
-  id_reembolso int not null,
-  status_reembolso varchar(255),
-   status_reembolso_enum varchar not null,
-  observacao_moderador text,
-  id_modificador int not null,
-  data_modificacao timestamp
-)
- INSERT INTO historico_reembolso (
-    id_historico_reembolso,
-    id_usuario,
-    id_viajem,
-    data_hora,
-    valor_reembolso,
-    metodo_pagamento,
-    status,
-    observacao
-)
+CREATE TABLE historico_reembolso (
+    id_historico SERIAL PRIMARY KEY,
+    fk_viagem INT NOT NULL,
+    data_hora TIMESTAMP NOT NULL DEFAULT NOW(),
+    valor_reembolso DECIMAL(10,2) NOT NULL,
+    metodo_pagamento VARCHAR(100) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    observacao TEXT,
+    constraint fk_viagem foreign key (fk_viagem) references viagem (id_viagem)
+);
+
+INSERT INTO historico_reembolso (fk_viagem, valor_reembolso, metodo_pagamento, status, observacao)
 VALUES
-    (1, 123, 1, NOW(), 120.50, 'Cartão de Crédito', 'concluido', 'Reembolso de passagem aérea'),
-    (2, 123, 2, NOW(), 85.00, 'Cartão de Crédito', 'concluido', 'Reembolso de hotel'),
-    (3, 456, 3, NOW(), 45.30, 'Dinheiro', 'concluido', 'Reembolso de alimentação'),
-    (4, 456, 4, NOW(), 210.00, 'Transferência', 'pendente', 'Aguardando liberação do banco'),
-    (5, 789, 5, NOW(), 68.75, 'Cartão de Crédito', 'concluido', 'Reembolso de transporte local'),
-    (6, 789, 6, NOW(), 95.40, 'Cartão de Crédito', 'concluido', 'Reembolso de alimentação'),
-    (7, 123, 7, NOW(), 152.00, 'Dinheiro', 'concluido', 'Reembolso de ingresso'),
-    (8, 456, 8, NOW(), 37.50, 'Cartão de Crédito', 'concluido', 'Reembolso de compra local'),
-    (9, 789, 9, NOW(), 120.00, 'Transferência', 'concluido', 'Reembolso de depósito'),
-    (10, 123, 10, NOW(), 55.00, 'Cartão de Crédito', 'pendente', 'Aguardando aprovação');
+    (1, 120.50, 'Cartão de Crédito', 'concluido', 'Reembolso de passagem aérea'),
+    (1, 85.00, 'Cartão de Crédito', 'concluido', 'Reembolso de hospedagem'),
+    (2, 45.30, 'Dinheiro', 'concluido', 'Reembolso de alimentação'),
+    (2, 210.00, 'Transferência', 'pendente', 'Aguardando liberação'),
+    (3, 68.75, 'Cartão de Crédito', 'concluido', 'Reembolso de transporte'),
+    (4, 95.40, 'Cartão de Crédito', 'concluido', 'Reembolso de refeição');
 
 
 CREATE TABLE bagagem (
-  id_checklist_item  SERIAL PRIMARY KEY,
-  id_viagem int not null,
-  nome_item varchar(100) not null,
-  item_checado boolean,
-  incluso_manualmente boolean
-)
- INSERT INTO bagagem (
-    id_bagagem,
-    id_usuario,
-    id_viajem,
-    peso_kg,
-    dimensoes,
-    data_checkin,
-    status,
-    observacao
-)
-VALUES
-    (1, 123, 1, 12.5, '55x40x20', '2025-12-15 06:00', 'pendente', 'Bagagem de mão'),
-    (2, 123, 2, 15.0, '65x45x30', '2025-12-18 07:30', 'checkin', 'Bagagem grande'),
-    (3, 456, 3, 8.0, '45x30x20', '2025-11-10 08:00', 'embarcado', 'Bagagem de mão'),
-    (4, 456, 4, 20.0, '70x50x30', '2025-11-12 10:00', 'checkin', 'Bagagem despachada'),
-    (5, 789, 5, 10.0, '50x40x25', '2025-10-25 05:30', 'pendente', 'Bagagem de mão'),
-    (6, 789, 6, 7.5, '45x30x20', '2025-10-28 09:00', 'checkin', 'Bagagem de mão'),
-    (7, 123, 7, 18.0, '60x45x25', '2025-08-10 06:00', 'checkin', 'Bagagem despachada'),
-    (8, 456, 8, 9.0, '50x40x25', '2025-08-12 08:30', 'embarcado', 'Bagagem de mão'),
-    (9, 789, 9, 6.0, '40x30x20', '2025-08-10 07:00', 'checkin', 'Bagagem pequena'),
-    (10, 123, 10, 14.0, '55x40x25', '2025-08-15 05:00', 'checkin', 'Bagagem de mão');
+    id_bagagem SERIAL PRIMARY KEY,
+    fk_viagem INT NOT NULL,
+    nome_item VARCHAR(100) NOT NULL,
+    item_checado BOOLEAN NOT NULL DEFAULT FALSE,
+    incluso_manualmente BOOLEAN NOT NULL DEFAULT FALSE,
+    constraint fk_viagem foreign key (fk_viagem) references viagem (id_viagem)
+);
 
-CREATE TABLE  item_bagagem_catalogo(
- id_item_bagagem_catalogo  SERIAL PRIMARY KEY ,
- nome_item varchar(100) not null ,
- perfil_viagem  varchar(255),
- tipo_viagem varchar(255),
- clima_indicado varchar(30)
-)
- INSERT INTO item_bagagem_catalago (
-    id_item_bagagem_catalago,
-    nome_item,
-    tipo,
-    dimensoes,
-    peso_maximo_kg,
-    descricao,
-    status
-)
+INSERT INTO bagagem (fk_viagem, nome_item, item_checado, incluso_manualmente)
 VALUES
-    (1, 'Mochila de viagem', 'Mochila', '45x30x20', 5.0, 'Mochila impermeável com compartimento interno', 'disponivel'),
-    (2, 'Maleta de cabine', 'Maleta', '55x35x20', 7.0, 'Maleta rígida com rodas', 'disponivel'),
-    (3, 'Valise grande', 'Maleta', '70x45x30', 12.0, 'Valise para despache com compartimento expandível', 'disponivel'),
-    (4, 'Saco de dormir', 'Acessório', '120x70x40', 1.5, 'Saco de dormir leve e confortável', 'disponivel'),
-    (5, 'Saco de lona', 'Acessório', '80x60x30', 2.0, 'Saco de lona para compras e equipamentos', 'disponivel'),
-    (6, 'Cinto de segurança', 'Acessório', '100x3', 0.3, 'Cinto de segurança para aviões', 'disponivel'),
-    (7, 'Kit de primeiros socorros', 'Acessório', '30x20x10', 1.2, 'Kit de primeiros socorros completo', 'disponivel'),
-    (8, 'Monitor de ar', 'Acessório', '20x15x10', 0.8, 'Monitor de ar com medidor de pressão', 'disponivel'),
-    (9, 'Guarda-chuva dobrável', 'Acessório', '120x80x10', 0.4, 'Guarda-chuva resistente à chuva', 'disponivel'),
-    (10, 'Lanterna LED', 'Acessório', '15x10x5', 0.2, 'Lanterna LED recarregável', 'disponivel');
+    (1, 'Mochila de viagem', TRUE, TRUE),
+    (1, 'Maleta de mão', FALSE, TRUE),
+    (2, 'Terno de viagem', FALSE, TRUE),
+    (2, 'Notebook', TRUE, TRUE),
+    (3, 'Guarda-chuva', FALSE, TRUE),
+    (4, 'Roupa formal', TRUE, TRUE);
 
 
- CREATE TABLE solicitacao_reembolso(
- id_reembolso  SERIAL PRIMARY KEY ,
- id_viagem int not null,
-id_solicitante INT NOT NULL,
- descricao_incidente text not null,
- valor_total_pleiteado decimal (10,2) not null,
- url_comprovante_anexo varchar(255)not null,
-  status_reembolso varchar(255)not null,
- id_moderador_analista int,
- data_soliticao timestamp,
- data_atualizacao timestamp
- )
-  INSERT INTO solicitacao_reembolso (
-id_solicitacao_reembolso,
-id_usuario,
-id_viajem,
-data_solicitacao,
-valor_solicitado,
-descricao,
-status,
-arquivo_comprovante
-)
-VALUES
-(1, 123, 1, NOW(), 350.00, 'Passagem aérea ida e volta', 'aprovado', 'comprovante_1.pdf'),
-(2, 123, 2, NOW(), 280.00, 'Hotel 5 noites', 'aprovado', 'comprovante_2.pdf'),
-(3, 456, 3, NOW(), 120.00, 'Alimentação e transporte local', 'aprovado', 'comprovante_3.pdf'),
-(4, 456, 4, NOW(), 450.00, 'Ingressos e passeios', 'pendente', NULL),
-(5, 789, 5, NOW(), 190.00, 'Transporte local e táxi', 'aprovado', 'comprovante_5.pdf'),
-(6, 789, 6, NOW(), 95.00, 'Alimentação', 'aprovado', 'comprovante_6.pdf'),
-(7, 123, 7, NOW(), 280.00, 'Ingresso para concerto', 'aprovado', 'comprovante_7.pdf'),
-(8, 456, 8, NOW(), 75.00, 'Compras e souvenirs', 'aprovado', 'comprovante_8.pdf'),
-(9, 789, 9, NOW(), 200.00, 'Depósito na conta', 'aprovado', 'comprovante_9.pdf'),
-(10, 123, 10, NOW(), 85.00, 'Compras no aeroporto', 'pendente', NULL);
+CREATE TABLE item_bagagem_catalago (
+    id_item_bagagem_catalago SERIAL PRIMARY KEY,
+    nome_item VARCHAR(100) NOT NULL UNIQUE,
+    perfil_viagem VARCHAR(255),
+    tipo_viagem VARCHAR(255),
+    clima_indicado VARCHAR(30)
+);
 
-CREATE TABLE   avaliacao_estabelecimento( 
-id_avaliacao  SERIAL PRIMARY KEY  ,
-id_usuarío INT NOT NULL,
-id_viagem        int not null,
-nome                int not null,
-comentario           text,
-data_avaliacao timestamp
-)
-INSERT INTO avaliacao_estabelecimento (
-    id_avaliacao,
-    id_estabelecimento,
-    id_usuario,
-    data_avaliacao,
-    nota,
-    comentario,
-    status
-)
+INSERT INTO item_bagagem_catalago (nome_item, perfil_viagem, tipo_viagem, clima_indicado)
 VALUES
-    (1, 101, 123, NOW(), 5.0, 'Excelente café, super recomendo! Atendimento ótimo e preço justo.', 'aprovado'),
-    (2, 102, 123, NOW(), 4.8, 'Pão de queijo delicioso, sempre fresquinho. Melhor padaria da região!', 'aprovado'),
-    (3, 103, 456, NOW(), 4.9, 'Churrasco incrível, carne suculenta e porções generosas.', 'aprovado'),
-    (4, 104, 456, NOW(), 4.7, 'Mercado completo com preços acessíveis e produtos de qualidade.', 'aprovado'),
-    (5, 105, 789, NOW(), 4.5, 'Lanche bom e rápido, sempre gostoso.', 'aprovado'),
-    (6, 106, 789, NOW(), 4.6, 'Barzinho agradável, drinks bem feitos e clima ótimo.', 'aprovado'),
-    (7, 107, 123, NOW(), 5.0, 'Sorvete da melhor qualidade, textura perfeita!', 'aprovado'),
-    (8, 108, 456, NOW(), 4.8, 'Restaurante com comida deliciosa e ambiente bonito.', 'aprovado'),
-    (9, 109, 789, NOW(), 4.9, 'Pet shop com atendimento excelente, produtos de qualidade.', 'aprovado'),
-    (10, 110, 123, NOW(), 4.7, 'Clínica profissional, sempre atende muito bem.', 'aprovado');
+    ('Mochila de viagem', 'Leve', 'Lazer', 'Médio'),
+    ('Maleta de cabine', 'Executivo', 'Trabalho', 'Médio'),
+    ('Valise grande', 'Turista', 'Lazer', 'Quente'),
+    ('Saco de dormir', 'Aventura', 'Aventura', 'Frio'),
+    ('Guarda-chuva dobrável', 'Todos', 'Todos', 'Chuva');
+
+
+CREATE TABLE avaliacao_estabelecimento (
+    id_avaliacao SERIAL PRIMARY KEY,
+    fk_usuario INT NOT NULL,
+    fk_viagem INT NOT NULL,
+    fk_estabelecimento INT NOT NULL,
+    nota INT NOT NULL CHECK (nota BETWEEN 1 AND 5),
+    comentario TEXT,
+    data_avaliacao TIMESTAMP NOT NULL DEFAULT NOW(),
+    constraint fk_usuario foreign key (fk_usuario) references usuario (id_usuario),
+    constraint fk_viagem foreign key (fk_viagem) references viagem (id_viagem),
+    constraint fk_estabelecimento foreign key (fk_estabelecimento) references estabelecimento (id_estabelecimento)
+);
+
+INSERT INTO avaliacao_estabelecimento (fk_usuario, fk_viagem, fk_estabelecimento, nota, comentario)
+VALUES
+    (1, 1, 101, 5, 'Excelente café, super recomendo!'),
+    (1, 1, 102, 4, 'Pão de queijo delicioso...'),
+    (2, 2, 103, 5, 'Churrasco incrível...'),
+    (2, 2, 104, 5, 'Mercado muito completo...'),
+    (3, 3, 105, 4, 'Lanche bom e rápido...'),
+    (3, 3, 106, 5, 'Barzinho muito agradável...'),
+    (1, 4, 107, 5, 'Sorvete da melhor qualidade...'),
+    (2, 2, 108, 5, 'Restaurante com comida deliciosa...');
